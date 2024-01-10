@@ -18,21 +18,19 @@ const Home = () => {
       const firstDay = new Date(
         curDate.getFullYear(),
         curDate.getMonth(),
-        1 //지금 년도 지금 월 1일이 됨
+        1 // 이번 달 1일
       ).getTime();
 
       const lastDay = new Date(
         curDate.getFullYear(),
         curDate.getMonth() + 1,
-        0 //지금 년도 지금 월 마지막날이 됨
+        1 // 다음 달 1일
       ).getTime();
 
       // 이렇게 첫번째 일과 마지막 일을 추리면 이 날 사이에 작성된 일기만을 추릴 수 있음
 
       setData(
-        diaryList.filter(
-          (item) => firstDay <= item.date && item.date <= lastDay
-        )
+        diaryList.filter((item) => firstDay <= item.date && item.date < lastDay)
       );
     }
   }, [diaryList, curDate]); // diaryList를 의존성 배열에 넣어야 하는 이유는 diaryList가 수정 변겅 삭제가 일어나면 이 부분도 재렌더링 되어야 하기 때문에

@@ -1,4 +1,4 @@
-import { useState, useRef, useContext, useEffect } from "react";
+import { useState, useRef, useContext, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 import MyButton from "./MyButton";
@@ -10,16 +10,19 @@ import { getStringDate } from "../util/date";
 import { emotionList } from "../util/emotion";
 
 const DiaryEditor = ({ isEdit, originData }) => {
-  const { onCreate, onEdit } = useContext(DiaryDispatchContext);
+  const { onCreate, onEdit, onRemove } = useContext(DiaryDispatchContext);
   const contentRef = useRef();
 
   const [content, setContent] = useState("");
   const [emotion, setEmotion] = useState(3);
   const [date, setDate] = useState(getStringDate(new Date()));
 
-  const handleClickEmote = (emotion) => {
-    setEmotion(emotion);
-  };
+  const handleClickEmote = useCallback(
+    (emotion) => {
+      setEmotion(emotion);
+    },
+    [] // emotion 만 전달하기 때문에 항상 최신의 emotion 을 받음 그러니 함수형 업데이트 전달할 필요 없음
+  );
   const navigate = useNavigate();
 
   const handleSubmit = () => {
@@ -42,6 +45,14 @@ const DiaryEditor = ({ isEdit, originData }) => {
     navigate("/", { replace: true });
   };
 
+  const handleRemove = () => {
+    if (window.confirm("정말 삭제하시겠습니까?")) {
+      onRemove(originData.id);
+      alert("삭제가 완료되었습니다.");
+      navigate("/", { replace: true });
+    }
+  };
+
   useEffect(() => {
     if (isEdit) {
       setDate(getStringDate(new Date(parseInt(originData.date))));
@@ -56,6 +67,15 @@ const DiaryEditor = ({ isEdit, originData }) => {
         headText={isEdit ? "일기 수정하기" : "새 일기 쓰기"}
         leftChild={
           <MyButton text={"< 뒤로가기"} onClick={() => navigate(-1)} />
+        }
+        rightChild={
+          isEdit && (
+            <MyButton
+              text="삭제하기"
+              type={"negative"}
+              onClick={handleRemove}
+            />
+          )
         }
       />
       <div>
